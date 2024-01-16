@@ -15,7 +15,8 @@ class LogSnagTest {
     fun sendTrackTest(): Unit = runBlocking {
         val res = logSnag.track(
             channel = "test",
-            event = "Unit test event"
+            event = "Unit test event",
+            userId = "test",
         )
         assertTrue { res }
     }

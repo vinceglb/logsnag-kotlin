@@ -51,7 +51,16 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.ktor.client.cio)
+        }
+
+        jvmTest.dependencies {
+            // Ktor Engine - OkHttp
+            implementation(libs.ktor.client.okhttp)
+        }
+
+        nativeTest.dependencies {
+            // Ktor Engine - Darwin
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

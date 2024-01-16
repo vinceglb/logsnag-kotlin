@@ -60,7 +60,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
         }
 
-        appleMain.dependencies {
+        nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
     }
