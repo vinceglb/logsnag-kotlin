@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  tests:
+    name: ✅ Run tests on JVM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Create local.properties file
+        run: |
+          echo "LOGSNAG_TOKEN=${{ secrets.LOGSNAG_TOKEN }}" > local.properties
+          echo "LOGSNAG_PROJECT=${{ secrets.LOGSNAG_PROJECT }}" >> local.properties
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Run tests
+        run: ./gradlew :logsnag-client:jvmTest --tests *.LogSnagTest
+
+  build:
+    name: 📦 Assemble
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Run Gradle build
+        shell: pwsh
+        run: .\gradlew assemble
