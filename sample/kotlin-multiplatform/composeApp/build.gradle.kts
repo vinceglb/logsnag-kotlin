@@ -42,7 +42,7 @@ kotlin {
             implementation(compose.components.resources)
 
             // LogSnag
-            implementation(projects.logsnagClient)
+            implementation(projects.logsnagKotlin)
         }
 
         androidMain.dependencies {

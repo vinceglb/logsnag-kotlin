@@ -6,11 +6,8 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.buildKonfig)
-    id("maven-publish")
+    alias(libs.plugins.mavenPublishVanniktech)
 }
-
-group = "com.logsnag.kotlin"
-version = "0.1"
 
 kotlin {
     androidTarget {
