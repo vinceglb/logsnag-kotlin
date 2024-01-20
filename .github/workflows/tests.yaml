@@ -29,7 +29,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Run tests
-        run: ./gradlew :logsnag-client:jvmTest --tests *.LogSnagTest
+        run: ./gradlew :logsnag-kotlin:jvmTest
 
   build:
     name: 📦 Assemble
