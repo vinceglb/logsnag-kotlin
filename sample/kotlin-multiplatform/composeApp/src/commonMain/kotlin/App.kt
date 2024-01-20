@@ -35,7 +35,8 @@ fun App() {
         val logSnag = remember {
             LogSnag(
                 token = LogSnagSecrets.LogSnagToken ?: throw Exception("LogSnagToken is null"),
-                project = LogSnagSecrets.LogSnagProject ?: throw Exception("LogSnagProject is null"),
+                project = LogSnagSecrets.LogSnagProject
+                    ?: throw Exception("LogSnagProject is null"),
             )
         }
         var isTrackingEnabled by remember { mutableStateOf(true) }
@@ -66,10 +67,22 @@ fun App() {
                     Button(onClick = { sendIdentify(coroutineScope, snackbarHostState, logSnag) }) {
                         Text("Send identify event")
                     }
-                    Button(onClick = { sendInsightTrack(coroutineScope, snackbarHostState, logSnag) }) {
+                    Button(onClick = {
+                        sendInsightTrack(
+                            coroutineScope,
+                            snackbarHostState,
+                            logSnag
+                        )
+                    }) {
                         Text("Send insight track event")
                     }
-                    Button(onClick = { sendInsightIncrement(coroutineScope, snackbarHostState, logSnag) }) {
+                    Button(onClick = {
+                        sendInsightIncrement(
+                            coroutineScope,
+                            snackbarHostState,
+                            logSnag
+                        )
+                    }) {
                         Text("Send insight increment event")
                     }
                     Spacer(modifier = Modifier.height(8.dp))
