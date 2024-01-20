@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation('io.github.vinceglb:logsnag-kotlin:0.1.0')
+    implementation("io.github.vinceglb:logsnag-kotlin:0.1.0")
 }
 ```
 
@@ -41,8 +41,8 @@ Create an instance of `LogSnag` client:
 
 ```kotlin
 val logSnag = LogSnag(
-	token = "your-token",
-	project = "your-project",
+    token = "your-token",
+    project = "your-project",
 )
 ```
 
