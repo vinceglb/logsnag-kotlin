@@ -95,9 +95,9 @@ Increment an insight track to LogSnag:
 
 ```kotlin
 logSnag.insightIncrement(
-		title = "User Count",
-		value = 1,
-		icon = "👨",
+    title = "User Count",
+    value = 1,
+    icon = "👨",
 )
 ```
 
