@@ -1,0 +1,29 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish to Sonatype
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Create local.properties file
+        run: |
+          echo "LOGSNAG_TOKEN=${{ secrets.LOGSNAG_TOKEN }}" > local.properties
+          echo "LOGSNAG_PROJECT=${{ secrets.LOGSNAG_PROJECT }}" >> local.properties
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Upload Artifacts
+        run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
