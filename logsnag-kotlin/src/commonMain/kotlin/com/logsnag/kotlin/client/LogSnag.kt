@@ -1,7 +1,7 @@
 package com.logsnag.kotlin.client
 
 import co.touchlab.kermit.Logger
-import com.logsnag.kotlin.api.LogSnagApi
+import com.logsnag.kotlin.api.SendEventTasksDataSource
 import com.logsnag.kotlin.types.IdentifyOptions
 import com.logsnag.kotlin.types.InsightIncrementOptions
 import com.logsnag.kotlin.types.InsightIncrementValue
@@ -11,11 +11,11 @@ import com.logsnag.kotlin.types.Properties
 import com.logsnag.kotlin.types.TrackOptions
 
 class LogSnag(
-    token: String,
+    private val token: String,
     private val project: String,
     private var disabled: Boolean = false,
 ) {
-    private val api = LogSnagApi(token)
+    private val log: SendEventTasksDataSource = SendEventTasksDataSource.instance
 
     /**
      * Disable tracking for this instance
@@ -53,7 +53,7 @@ class LogSnag(
      * @param timestamp Event timestamp
      * @returns true if event was sent successfully
      */
-    suspend fun track(
+    fun track(
         channel: String,
         event: String,
         description: String? = null,
@@ -81,7 +81,7 @@ class LogSnag(
         )
 
         // Send track request
-        api.track(options)
+        log.track(options, token)
 
         return true
     }
@@ -93,7 +93,7 @@ class LogSnag(
      * @param properties User properties
      * @returns true if identify was sent successfully
      */
-    suspend fun identify(
+    fun identify(
         userId: String,
         properties: Properties
     ): Boolean {
@@ -107,7 +107,7 @@ class LogSnag(
         )
 
         // Send identify request
-        api.identify(options)
+        log.identify(options, token)
 
         return true
     }
@@ -120,7 +120,7 @@ class LogSnag(
      * @param icon Insight icon (emoji). Must be a single emoji
      * @returns true if insight was sent successfully
      */
-    suspend fun insightTrack(
+    fun insightTrack(
         title: String,
         value: String,
         icon: String? = null,
@@ -136,7 +136,7 @@ class LogSnag(
         )
 
         // Send insight request
-        api.insightTrack(options)
+        log.insightTrack(options, token)
 
         return true
     }
@@ -149,7 +149,7 @@ class LogSnag(
      * @param icon Insight icon (emoji). Must be a single emoji
      * @returns true if insight was sent successfully
      */
-    suspend fun insightIncrement(
+    fun insightIncrement(
         title: String,
         value: Int,
         icon: String? = null,
@@ -165,7 +165,7 @@ class LogSnag(
         )
 
         // Send insight request
-        api.insightIncrement(options)
+        log.insightIncrement(options, token)
 
         return true
     }
