@@ -50,6 +50,11 @@ kotlin {
             implementation(libs.kotlin.test)
         }
 
+        androidMain.dependencies {
+            implementation(libs.androidx.appStartup)
+            implementation(libs.androidx.workmanager)
+        }
+
         jvmTest.dependencies {
             // Ktor Engine - OkHttp
             implementation(libs.ktor.client.okhttp)
@@ -58,6 +63,14 @@ kotlin {
         nativeTest.dependencies {
             // Ktor Engine - Darwin
             implementation(libs.ktor.client.darwin)
+        }
+    }
+
+    targets.all {
+        compilations.all {
+            compilerOptions.configure {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
         }
     }
 }
