@@ -1,7 +1,7 @@
 package com.logsnag.kotlin.client
 
 import co.touchlab.kermit.Logger
-import com.logsnag.kotlin.ENDPOINTS
+import com.logsnag.kotlin.api.LogSnagApi
 import com.logsnag.kotlin.types.IdentifyOptions
 import com.logsnag.kotlin.types.InsightIncrementOptions
 import com.logsnag.kotlin.types.InsightIncrementValue
@@ -9,33 +9,13 @@ import com.logsnag.kotlin.types.InsightTrackOptions
 import com.logsnag.kotlin.types.Parser
 import com.logsnag.kotlin.types.Properties
 import com.logsnag.kotlin.types.TrackOptions
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.patch
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 
 class LogSnag(
-    private val token: String,
+    token: String,
     private val project: String,
     private var disabled: Boolean = false,
 ) {
-    @OptIn(ExperimentalSerializationApi::class)
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                explicitNulls = false
-            })
-        }
-    }
+    private val api = LogSnagApi(token)
 
     /**
      * Disable tracking for this instance
@@ -101,19 +81,7 @@ class LogSnag(
         )
 
         // Send track request
-        val response = client.post(ENDPOINTS.LOG) {
-            contentType(ContentType.Application.Json)
-            bearerAuth(token)
-            setBody(options)
-        }
-
-        // Check response status
-        if (!response.status.isSuccess()) {
-            throw LogSnagException(
-                status = response.status.value,
-                body = response.bodyAsText()
-            )
-        }
+        api.track(options)
 
         return true
     }
@@ -139,19 +107,7 @@ class LogSnag(
         )
 
         // Send identify request
-        val response = client.post(ENDPOINTS.IDENTIFY) {
-            contentType(ContentType.Application.Json)
-            bearerAuth(token)
-            setBody(options)
-        }
-
-        // Check response status
-        if (!response.status.isSuccess()) {
-            throw LogSnagException(
-                status = response.status.value,
-                body = response.bodyAsText()
-            )
-        }
+        api.identify(options)
 
         return true
     }
@@ -180,19 +136,7 @@ class LogSnag(
         )
 
         // Send insight request
-        val response = client.post(ENDPOINTS.INSIGHT) {
-            contentType(ContentType.Application.Json)
-            bearerAuth(token)
-            setBody(options)
-        }
-
-        // Check response status
-        if (!response.status.isSuccess()) {
-            throw LogSnagException(
-                status = response.status.value,
-                body = response.bodyAsText()
-            )
-        }
+        api.insightTrack(options)
 
         return true
     }
@@ -221,19 +165,7 @@ class LogSnag(
         )
 
         // Send insight request
-        val response = client.patch(ENDPOINTS.INSIGHT) {
-            contentType(ContentType.Application.Json)
-            bearerAuth(token)
-            setBody(options)
-        }
-
-        // Check response status
-        if (!response.status.isSuccess()) {
-            throw LogSnagException(
-                status = response.status.value,
-                body = response.bodyAsText()
-            )
-        }
+        api.insightIncrement(options)
 
         return true
     }
