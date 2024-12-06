@@ -1,6 +1,6 @@
 package com.logsnag.kotlin.types
 
-enum class EventType {
+internal enum class EventType {
     TRACK,
     IDENTIFY,
     INSIGHT,

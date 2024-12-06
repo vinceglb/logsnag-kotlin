@@ -7,6 +7,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import co.touchlab.kermit.Logger
+import com.logsnag.kotlin.LogSnagConfig
 import com.logsnag.kotlin.types.EventType
 import com.logsnag.kotlin.types.IdentifyOptions
 import com.logsnag.kotlin.types.InsightIncrementOptions
@@ -20,10 +21,11 @@ import com.logsnag.kotlin.worker.SendEventWorker.Companion.WORKER_TAG
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-internal actual class SendEventTasksDataSource private constructor(
-    private val workManager: WorkManager,
+internal actual class SendEventTasksDataSource(
+    private val token: String,
+    private val workManager: WorkManager = SendEventTasksDataSource.workManager,
 ) {
-    actual fun track(trackOptions: TrackOptions, token: String) {
+    actual suspend fun track(trackOptions: TrackOptions) {
         startWorkRequest(
             eventType = EventType.TRACK,
             eventPayload = Json.encodeToString(trackOptions),
@@ -31,7 +33,7 @@ internal actual class SendEventTasksDataSource private constructor(
         )
     }
 
-    actual fun identify(identifyOptions: IdentifyOptions, token: String) {
+    actual suspend fun identify(identifyOptions: IdentifyOptions) {
         startWorkRequest(
             eventType = EventType.IDENTIFY,
             eventPayload = Json.encodeToString(identifyOptions),
@@ -39,7 +41,7 @@ internal actual class SendEventTasksDataSource private constructor(
         )
     }
 
-    actual fun insightTrack(insightTrackOptions: InsightTrackOptions, token: String) {
+    actual suspend fun insightTrack(insightTrackOptions: InsightTrackOptions) {
         startWorkRequest(
             eventType = EventType.INSIGHT,
             eventPayload = Json.encodeToString(insightTrackOptions),
@@ -47,7 +49,7 @@ internal actual class SendEventTasksDataSource private constructor(
         )
     }
 
-    actual fun insightIncrement(insightIncrementOptions: InsightIncrementOptions, token: String) {
+    actual suspend fun insightIncrement(insightIncrementOptions: InsightIncrementOptions) {
         startWorkRequest(
             eventType = EventType.INCREMENT,
             eventPayload = Json.encodeToString(insightIncrementOptions),
@@ -79,17 +81,18 @@ internal actual class SendEventTasksDataSource private constructor(
         workManager.enqueue(request)
     }
 
-    actual companion object {
-        private var sendEventTasksDataSource: SendEventTasksDataSource? = null
+    companion object {
+        private lateinit var workManager: WorkManager
 
-        fun init(workManager: WorkManager): SendEventTasksDataSource {
-            sendEventTasksDataSource = SendEventTasksDataSource(workManager)
+        fun init(workManager: WorkManager) {
+            this.workManager = workManager
             Logger.d("SendEventTasksDataSource") { "Initialized" }
-            return instance
         }
+    }
 
-        actual val instance: SendEventTasksDataSource
-            get() = sendEventTasksDataSource
-                ?: throw IllegalStateException("EventTasksDataSource has not been initialized")
+    actual object Factory {
+        actual fun create(config: LogSnagConfig): SendEventTasksDataSource {
+            return SendEventTasksDataSource(config.token)
+        }
     }
 }

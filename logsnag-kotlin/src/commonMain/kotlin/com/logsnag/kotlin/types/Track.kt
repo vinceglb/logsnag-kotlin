@@ -69,7 +69,7 @@ internal data class TrackOptions(
 )
 
 /** Tag Type **/
-typealias Parser = String // Assuming that 'markdown' or 'text' are valid values for Parser
+internal typealias Parser = String // Assuming that 'markdown' or 'text' are valid values for Parser
 
 /** Properties Type **/
-typealias Properties = Map<String, String>
+internal typealias Properties = Map<String, String>

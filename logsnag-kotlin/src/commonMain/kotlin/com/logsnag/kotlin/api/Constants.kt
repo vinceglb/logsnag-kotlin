@@ -1,4 +1,4 @@
-package com.logsnag.kotlin
+package com.logsnag.kotlin.api
 
 /**
  * LogSnag Base Endpoint

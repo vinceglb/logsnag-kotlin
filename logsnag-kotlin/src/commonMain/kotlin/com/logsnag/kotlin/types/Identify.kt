@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * Options for publishing LogSnag identify
  */
 @Serializable
-data class IdentifyOptions(
+internal data class IdentifyOptions(
     /**
      * Project name
      * example: "my-project"

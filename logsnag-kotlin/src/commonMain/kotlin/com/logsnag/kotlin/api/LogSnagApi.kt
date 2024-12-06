@@ -1,14 +1,12 @@
 package com.logsnag.kotlin.api
 
-import com.logsnag.kotlin.ENDPOINTS
-import com.logsnag.kotlin.client.LogSnagException
+import com.logsnag.kotlin.types.EventSuccess
 import com.logsnag.kotlin.types.IdentifyOptions
 import com.logsnag.kotlin.types.InsightIncrementOptions
 import com.logsnag.kotlin.types.InsightTrackOptions
 import com.logsnag.kotlin.types.TrackOptions
 import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -16,33 +14,17 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 
 /**
  * Call the LogSnag API
  */
-internal class LogSnagApi(
-    private val token: String,
-) {
-    @OptIn(ExperimentalSerializationApi::class)
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                explicitNulls = false
-            })
-        }
-    }
-
+internal class LogSnagApi(private val client: HttpClient) {
     /**
      * Track an event
      */
-    suspend fun track(trackOptions: TrackOptions): Result<Unit> = runSafely {
-        // Send track request
+    suspend fun track(trackOptions: TrackOptions) = runSafely {
         client.post(ENDPOINTS.LOG) {
             contentType(ContentType.Application.Json)
-            bearerAuth(token)
             setBody(trackOptions)
         }
     }
@@ -50,10 +32,9 @@ internal class LogSnagApi(
     /**
      * Identify a user
      */
-    suspend fun identify(identifyOptions: IdentifyOptions): Result<Unit> = runSafely {
+    suspend fun identify(identifyOptions: IdentifyOptions) = runSafely {
         client.post(ENDPOINTS.IDENTIFY) {
             contentType(ContentType.Application.Json)
-            bearerAuth(token)
             setBody(identifyOptions)
         }
     }
@@ -61,10 +42,9 @@ internal class LogSnagApi(
     /**
      * Track an insight
      */
-    suspend fun insightTrack(insightTrackOptions: InsightTrackOptions): Result<Unit> = runSafely {
+    suspend fun insightTrack(insightTrackOptions: InsightTrackOptions): Result<EventSuccess> = runSafely {
         client.post(ENDPOINTS.INSIGHT) {
             contentType(ContentType.Application.Json)
-            bearerAuth(token)
             setBody(insightTrackOptions)
         }
     }
@@ -72,10 +52,9 @@ internal class LogSnagApi(
     /**
      * Increment an insight
      */
-    suspend fun insightIncrement(insightIncrementOptions: InsightIncrementOptions): Result<Unit> = runSafely {
-        client.post(ENDPOINTS.INSIGHT) {
+    suspend fun insightIncrement(insightIncrementOptions: InsightIncrementOptions): Result<EventSuccess> = runSafely {
+        client.patch(ENDPOINTS.INSIGHT) {
             contentType(ContentType.Application.Json)
-            bearerAuth(token)
             setBody(insightIncrementOptions)
         }
     }
@@ -86,7 +65,7 @@ internal class LogSnagApi(
      * @param block code to run
      * @return Result
      */
-    private suspend fun runSafely(block: suspend () -> HttpResponse): Result<Unit> {
+    private suspend fun runSafely(block: suspend () -> HttpResponse): Result<EventSuccess> {
         return try {
             // Send request
             val response = block()
@@ -100,7 +79,10 @@ internal class LogSnagApi(
             }
 
             // Return success
-            Result.success(Unit)
+            Result.success(EventSuccess(
+                status = response.status.value,
+                message = response.status.description,
+            ))
         } catch (e: Exception) {
             Result.failure(e)
         }

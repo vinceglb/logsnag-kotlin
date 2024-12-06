@@ -1,4 +1,4 @@
-package com.logsnag.kotlin.client
+package com.logsnag.kotlin
 
 import co.touchlab.kermit.Logger
 import com.logsnag.kotlin.api.SendEventTasksDataSource
@@ -9,19 +9,28 @@ import com.logsnag.kotlin.types.InsightTrackOptions
 import com.logsnag.kotlin.types.Parser
 import com.logsnag.kotlin.types.Properties
 import com.logsnag.kotlin.types.TrackOptions
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 
-class LogSnag(
-    private val token: String,
+public class LogSnag(
+    token: String,
     private val project: String,
     private var disabled: Boolean = false,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
-    private val log: SendEventTasksDataSource = SendEventTasksDataSource.instance
+    private val scope = CoroutineScope(dispatcher)
+    private val log: SendEventTasksDataSource = SendEventTasksDataSource.Factory.create(
+        config = LogSnagConfig(token)
+    )
 
     /**
      * Disable tracking for this instance
      * (this is useful for development)
      */
-    fun disableTracking() {
+    public fun disableTracking() {
         disabled = true
     }
 
@@ -29,7 +38,7 @@ class LogSnag(
      * Enable tracking for this instance
      * (this is useful for development)
      */
-    fun enableTracking() {
+    public fun enableTracking() {
         disabled = false
     }
 
@@ -37,7 +46,7 @@ class LogSnag(
      * Get project name
      * @returns project name
      */
-    fun getProject(): String = project
+    public fun getProject(): String = project
 
     /**
      * Publish a new event to LogSnag
@@ -53,7 +62,7 @@ class LogSnag(
      * @param timestamp Event timestamp
      * @returns true if event was sent successfully
      */
-    fun track(
+    public fun track(
         channel: String,
         event: String,
         description: String? = null,
@@ -63,8 +72,8 @@ class LogSnag(
         notify: Boolean = false,
         parser: Parser? = null,
         timestamp: Long? = null
-    ): Boolean {
-        if (disabled) return true
+    ) {
+        if (disabled) return
 
         // Construct track options
         val options = TrackOptions(
@@ -81,9 +90,7 @@ class LogSnag(
         )
 
         // Send track request
-        log.track(options, token)
-
-        return true
+        scope.launch { log.track(options) }
     }
 
     /**
@@ -93,11 +100,11 @@ class LogSnag(
      * @param properties User properties
      * @returns true if identify was sent successfully
      */
-    fun identify(
+    public fun identify(
         userId: String,
         properties: Properties
-    ): Boolean {
-        if (disabled) return true
+    ) {
+        if (disabled) return
 
         // Construct identify options
         val options = IdentifyOptions(
@@ -107,9 +114,7 @@ class LogSnag(
         )
 
         // Send identify request
-        log.identify(options, token)
-
-        return true
+        scope.launch { log.identify(options) }
     }
 
     /**
@@ -120,12 +125,12 @@ class LogSnag(
      * @param icon Insight icon (emoji). Must be a single emoji
      * @returns true if insight was sent successfully
      */
-    fun insightTrack(
+    public fun insightTrack(
         title: String,
         value: String,
         icon: String? = null,
-    ): Boolean {
-        if (disabled) return true
+    ) {
+        if (disabled) return
 
         // Construct insight options
         val options = InsightTrackOptions(
@@ -136,9 +141,9 @@ class LogSnag(
         )
 
         // Send insight request
-        log.insightTrack(options, token)
-
-        return true
+        scope.launch {
+            log.insightTrack(options)
+        }
     }
 
     /**
@@ -149,12 +154,12 @@ class LogSnag(
      * @param icon Insight icon (emoji). Must be a single emoji
      * @returns true if insight was sent successfully
      */
-    fun insightIncrement(
+    public fun insightIncrement(
         title: String,
         value: Int,
         icon: String? = null,
-    ): Boolean {
-        if (disabled) return true
+    ) {
+        if (disabled) return
 
         // Construct insight options
         val options = InsightIncrementOptions(
@@ -165,9 +170,7 @@ class LogSnag(
         )
 
         // Send insight request
-        log.insightIncrement(options, token)
-
-        return true
+        scope.launch { log.insightIncrement(options) }
     }
 
     private fun cleanProperties(properties: Properties): Properties {

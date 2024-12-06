@@ -3,7 +3,9 @@ package com.logsnag.kotlin.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.logsnag.kotlin.LogSnagConfig
 import com.logsnag.kotlin.api.LogSnagApi
+import com.logsnag.kotlin.createHttpClient
 import com.logsnag.kotlin.types.EventType
 import com.logsnag.kotlin.types.IdentifyOptions
 import com.logsnag.kotlin.types.InsightIncrementOptions
@@ -32,7 +34,9 @@ internal class SendEventWorker(
             ?: return Result.failure()
 
         // Create API
-        val logSnagApi = LogSnagApi(token)
+        val config = LogSnagConfig(token)
+        val client = createHttpClient(config)
+        val logSnagApi = LogSnagApi(client)
 
         // Send event
         val result = when (eventType) {
@@ -60,8 +64,10 @@ internal class SendEventWorker(
         return if (result.isSuccess) {
             Result.success()
         } else {
-            // TODO - Cancel worker if it fails too many times
-            Result.retry()
+            when {
+                runAttemptCount < 3 -> Result.retry()
+                else -> Result.failure()
+            }
         }
     }
 

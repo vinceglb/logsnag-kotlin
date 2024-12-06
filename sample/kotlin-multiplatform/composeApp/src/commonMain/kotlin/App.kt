@@ -22,8 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.logsnag.LogSnagSecrets
-import com.logsnag.kotlin.client.LogSnag
-import com.logsnag.kotlin.client.LogSnagException
+import com.logsnag.kotlin.LogSnag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -111,21 +110,17 @@ private fun sendTrack(
     snackbarHostState: SnackbarHostState,
     logSnag: LogSnag
 ) {
+    logSnag.track(
+        channel = "sample",
+        event = "Hello from $platform!",
+        description = "This is a test event",
+        icon = "🌱",
+        userId = "user_123",
+        tags = mapOf("platform" to platform),
+    )
+
     coroutineScope.launch {
-        try {
-            logSnag.track(
-                channel = "sample",
-                event = "Hello from $platform!",
-                description = "This is a test event",
-                icon = "🌱",
-                userId = "user_123",
-                tags = mapOf("platform" to platform),
-            )
-            snackbarHostState.showSnackbar("Log sent successfully!")
-        } catch (e: LogSnagException) {
-            snackbarHostState.showSnackbar("Error sending log: ${e.status}. Check console for details.")
-            e.printStackTrace()
-        }
+        snackbarHostState.showSnackbar("Log sent!")
     }
 }
 
@@ -134,20 +129,16 @@ private fun sendIdentify(
     snackbarHostState: SnackbarHostState,
     logSnag: LogSnag
 ) {
+    logSnag.identify(
+        userId = "user_123",
+        properties = mapOf(
+            "username" to "mattie",
+            "email" to "mattie@gmail.com"
+        ),
+    )
+
     coroutineScope.launch {
-        try {
-            logSnag.identify(
-                userId = "user_123",
-                properties = mapOf(
-                    "username" to "mattie",
-                    "email" to "mattie@gmail.com"
-                ),
-            )
-            snackbarHostState.showSnackbar("Identify sent successfully!")
-        } catch (e: LogSnagException) {
-            snackbarHostState.showSnackbar("Error sending identify: ${e.status}. Check console for details.")
-            e.printStackTrace()
-        }
+        snackbarHostState.showSnackbar("Identify sent successfully!")
     }
 }
 
@@ -156,18 +147,14 @@ private fun sendInsightTrack(
     snackbarHostState: SnackbarHostState,
     logSnag: LogSnag
 ) {
+    logSnag.insightTrack(
+        title = "Insight track title",
+        value = "test",
+        icon = "🍉",
+    )
+
     coroutineScope.launch {
-        try {
-            logSnag.insightTrack(
-                title = "Insight track title",
-                value = "test",
-                icon = "🍉",
-            )
-            snackbarHostState.showSnackbar("Insight track sent successfully!")
-        } catch (e: LogSnagException) {
-            snackbarHostState.showSnackbar("Error sending insight track: ${e.status}. Check console for details.")
-            e.printStackTrace()
-        }
+        snackbarHostState.showSnackbar("Insight track sent successfully!")
     }
 }
 
@@ -176,17 +163,13 @@ private fun sendInsightIncrement(
     snackbarHostState: SnackbarHostState,
     logSnag: LogSnag
 ) {
+    logSnag.insightIncrement(
+        title = "Insight increment title",
+        value = 1,
+        icon = "🍗",
+    )
+
     coroutineScope.launch {
-        try {
-            logSnag.insightIncrement(
-                title = "Insight increment title",
-                value = 1,
-                icon = "🍗",
-            )
-            snackbarHostState.showSnackbar("Insight increment sent successfully!")
-        } catch (e: LogSnagException) {
-            snackbarHostState.showSnackbar("Error sending insight increment: ${e.status}. Check console for details.")
-            e.printStackTrace()
-        }
+        snackbarHostState.showSnackbar("Insight increment sent successfully!")
     }
 }
