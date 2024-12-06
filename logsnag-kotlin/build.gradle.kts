@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -10,13 +11,14 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
+    applyDefaultHierarchyTemplate()
+
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
+        publishLibraryVariants("release")
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
-        publishLibraryVariants("release", "debug")
     }
 
     jvm()
@@ -38,6 +40,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.json)
+            implementation(libs.ktor.client.auth)
 
             // Serialization
             implementation(libs.kotlinx.serialization.json)
@@ -48,6 +51,8 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
         }
 
         androidMain.dependencies {
@@ -64,22 +69,31 @@ kotlin {
             // Ktor Engine - Darwin
             implementation(libs.ktor.client.darwin)
         }
+
+        val nonAndroidMain by creating { dependsOn(commonMain.get()) }
+        nativeMain.get().dependsOn(nonAndroidMain)
+        jvmMain.get().dependsOn(nonAndroidMain)
+
+        val nonAndroidTest by creating { dependsOn(commonTest.get()) }
+        nativeTest.get().dependsOn(nonAndroidTest)
+        jvmTest.get().dependsOn(nonAndroidTest)
     }
 
-    targets.all {
-        compilations.all {
-            compilerOptions.configure {
-                freeCompilerArgs.add("-Xexpect-actual-classes")
-            }
-        }
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
 
 android {
     namespace = "com.logsnag.kotlin"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -91,13 +105,13 @@ buildkonfig {
         buildConfigField(
             type = FieldSpec.Type.STRING,
             name = "LogSnagToken",
-            value = gradleLocalProperties(project.rootDir).getProperty("LOGSNAG_TOKEN"),
+            value = gradleLocalProperties(project.rootDir, providers).getProperty("LOGSNAG_TOKEN"),
             nullable = true
         )
         buildConfigField(
             type = FieldSpec.Type.STRING,
             name = "LogSnagProject",
-            value = gradleLocalProperties(project.rootDir).getProperty("LOGSNAG_PROJECT"),
+            value = gradleLocalProperties(project.rootDir, providers).getProperty("LOGSNAG_PROJECT"),
             nullable = true,
         )
     }
