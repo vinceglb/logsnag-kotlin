@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.vinceglb:logsnag-kotlin:1.1.0")
+    implementation("io.github.vinceglb:logsnag-kotlin:1.1.1")
 }
 ```
 
