@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.sample.kotlinMultiplatform.composeApp)
+    implementation(projects.sample.shared)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.compose.material)

@@ -49,4 +49,4 @@ jobs:
 
       - name: Build targeted artifacts
         shell: pwsh
-        run: .\gradlew :logsnag-kotlin:jvmJar :sample:kotlin-multiplatform:androidApp:assembleDebug :sample:kotlin-multiplatform:composeApp:packageDistributionForCurrentOS
+        run: .\gradlew :logsnag-kotlin:jvmJar :sample:androidApp:assembleDebug :sample:desktopApp:packageDistributionForCurrentOS

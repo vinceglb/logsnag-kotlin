@@ -16,5 +16,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "logsnag-kt"
 include(":logsnag-kotlin")
-include(":sample:kotlin-multiplatform:androidApp")
-include(":sample:kotlin-multiplatform:composeApp")
+include(":sample:androidApp")
+include(":sample:desktopApp")
+include(":sample:shared")

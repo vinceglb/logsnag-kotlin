@@ -1,5 +1,3 @@
-
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -22,21 +20,19 @@ kotlin {
         androidResources.enable = true
     }
 
-    jvm("desktop")
+    jvm()
 
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "SampleSharedKit"
             isStatic = true
         }
     }
 
     sourceSets {
-        val desktopMain = getByName("desktopMain")
-
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -54,27 +50,13 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
         }
 
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-
+        jvmMain.dependencies {
             // Ktor Engine - OkHttp
             implementation(libs.ktor.client.okhttp)
         }
 
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
-        }
-    }
-}
-
-compose.desktop {
-    application {
-        mainClass = "MainKt"
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.logsnag.sample"
-            packageVersion = "1.0.0"
         }
     }
 }
