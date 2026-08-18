@@ -1,24 +1,31 @@
 [versions]
-agp = "8.11.0"
-androidx-activityCompose = "1.10.1"
+agp = "9.3.1"
+android-compileSdk = "37"
+android-minSdk = "23"
+android-targetSdk = "37"
+androidx-activityCompose = "1.13.0"
 androidx-appStartup = "1.2.0"
-androidx-workmanager = "2.10.1"
-buildKonfig = "0.17.1"
-compose = "1.8.2"
-compose-multiplatform = "1.8.1"
-kermit = "2.0.5"
-kotlin = "2.1.21"
-kotlinx-coroutines = "1.10.2"
-kotlinxSerializationJson = "1.8.1"
-ktor = "3.1.3"
-mavenPublish = "0.32.0"
+androidx-workmanager = "2.11.2"
+buildKonfig = "0.22.0"
+compose-multiplatform = "1.11.1"
+kermit = "2.1.0"
+kotlin = "2.4.10"
+kotlinx-coroutines = "1.11.0"
+kotlinxSerializationJson = "1.11.0"
+ktor = "3.5.2"
+mavenPublish = "0.37.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-appStartup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-appStartup" }
 androidx-workmanager = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workmanager" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose-multiplatform" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-multiplatform" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-multiplatform" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
@@ -33,7 +40,7 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 buildKonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

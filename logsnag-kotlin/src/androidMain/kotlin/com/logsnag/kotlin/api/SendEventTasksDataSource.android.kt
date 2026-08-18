@@ -86,7 +86,7 @@ internal actual class SendEventTasksDataSource(
 
         fun init(workManager: WorkManager) {
             this.workManager = workManager
-            Logger.d("SendEventTasksDataSource") { "Initialized" }
+            Logger.d(tag = "SendEventTasksDataSource") { "Initialized" }
         }
     }
 
