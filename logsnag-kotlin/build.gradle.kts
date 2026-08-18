@@ -1,10 +1,10 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.buildKonfig)
     alias(libs.plugins.mavenPublishVanniktech)
@@ -14,11 +14,16 @@ kotlin {
     explicitApi()
     applyDefaultHierarchyTemplate()
 
-    androidTarget {
-        publishLibraryVariants("release")
+    android {
+        namespace = "com.logsnag.kotlin"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
+
+        withHostTest {}
     }
 
     jvm()
@@ -70,11 +75,11 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
 
-        val nonAndroidMain by creating { dependsOn(commonMain.get()) }
+        val nonAndroidMain = create("nonAndroidMain") { dependsOn(commonMain.get()) }
         nativeMain.get().dependsOn(nonAndroidMain)
         jvmMain.get().dependsOn(nonAndroidMain)
 
-        val nonAndroidTest by creating { dependsOn(commonTest.get()) }
+        val nonAndroidTest = create("nonAndroidTest") { dependsOn(commonTest.get()) }
         nativeTest.get().dependsOn(nonAndroidTest)
         jvmTest.get().dependsOn(nonAndroidTest)
     }
@@ -84,17 +89,11 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.logsnag.kotlin"
-    compileSdk = 35
-    defaultConfig {
-        minSdk = 21
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+val localProperties = Properties().apply {
+    rootProject.file("local.properties")
+        .takeIf { it.isFile }
+        ?.inputStream()
+        ?.use { load(it) }
 }
 
 buildkonfig {
@@ -105,13 +104,13 @@ buildkonfig {
         buildConfigField(
             type = FieldSpec.Type.STRING,
             name = "LogSnagToken",
-            value = gradleLocalProperties(project.rootDir, providers).getProperty("LOGSNAG_TOKEN"),
+            value = localProperties.getProperty("LOGSNAG_TOKEN"),
             nullable = true
         )
         buildConfigField(
             type = FieldSpec.Type.STRING,
             name = "LogSnagProject",
-            value = gradleLocalProperties(project.rootDir, providers).getProperty("LOGSNAG_PROJECT"),
+            value = localProperties.getProperty("LOGSNAG_PROJECT"),
             nullable = true,
         )
     }

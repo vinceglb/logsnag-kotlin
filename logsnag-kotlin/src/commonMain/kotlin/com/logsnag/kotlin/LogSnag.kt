@@ -176,7 +176,7 @@ public class LogSnag(
     private fun cleanProperties(properties: Properties): Properties {
         return properties.mapKeys {
             if (it.key != it.key.lowercase().replace(" ", "-")) {
-                Logger.w("LogSnag") { "Tags Key must be lowercase with no spaces" }
+                Logger.w(tag = "LogSnag") { "Tags Key must be lowercase with no spaces" }
                 it.key.lowercase().replace(" ", "-")
             } else {
                 it.key
